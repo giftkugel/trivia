@@ -128,17 +128,7 @@ public class Game {
 
 	private Category currentCategory() {
 		int currentPlace = getCurrentPlayer().getPlace();
-		int categoryValue = currentPlace % 4;
-		switch (categoryValue) {
-			case 0:
-				return Category.POP;
-			case 1:
-				return Category.SCIENCE;
-			case 2:
-				return Category.SPORTS;
-			default:
-				return Category.ROCK;
-		}
+		return Category.getCategoryForPlace(currentPlace);
 	}
 
 	private void writeMessageForCurrentPlayer(final String message) {
