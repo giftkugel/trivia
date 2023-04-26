@@ -42,7 +42,7 @@ public class Game {
 		players.add(new Player(playerName));
 
 		messageCollector.writeMessage(playerName + " was added");
-		messageCollector.writeMessage("They are player number " + players.size());
+		messageCollector.writeMessage("They are player number " + howManyPlayers());
 		return true;
 	}
 
@@ -51,21 +51,23 @@ public class Game {
 	}
 
 	public void roll(int roll) {
-		messageCollector.writeMessage(players.get(currentPlayerIndex) + " is the current player");
+		messageCollector.writeMessage(getCurrentPlayer() + " is the current player");
 		messageCollector.writeMessage("They have rolled a " + roll);
 
+		boolean outOfPenaltyBox = roll % 2 != 0;
 		if (getCurrentPlayer().isInPenaltyBox()) {
-			if (roll % 2 != 0) {
-				getCurrentPlayer().setGettingOutOfPenaltyBox(true);
-
-				messageCollector.writeMessage(players.get(currentPlayerIndex) + " is getting out of the penalty box");
-				calculatePlayerPlace(roll);
-				askQuestion();
+			getCurrentPlayer().setGettingOutOfPenaltyBox(outOfPenaltyBox);
+			if (outOfPenaltyBox) {
+				messageCollector.writeMessage(getCurrentPlayer() + " is getting out of the penalty box");
 			} else {
-				messageCollector.writeMessage(players.get(currentPlayerIndex) + " is not getting out of the penalty box");
-				getCurrentPlayer().setGettingOutOfPenaltyBox(false);
+				messageCollector.writeMessage(getCurrentPlayer() + " is not getting out of the penalty box");
 			}
-		} else {
+		}
+
+		boolean playerNotInPenaltyBox = !getCurrentPlayer().isInPenaltyBox();
+		boolean playerWillLeavePenaltyBox = getCurrentPlayer().isInPenaltyBox() && getCurrentPlayer().isGettingOutOfPenaltyBox();
+
+		if (playerNotInPenaltyBox || playerWillLeavePenaltyBox) {
 			calculatePlayerPlace(roll);
 			askQuestion();
 		}
@@ -77,7 +79,7 @@ public class Game {
 		currentPlayer.calculatePlace(roll);
 
 
-		messageCollector.writeMessage(currentPlayer.getName()
+		messageCollector.writeMessage(getCurrentPlayer()
 				+ "'s new location is "
 				+ currentPlayer.getPlace());
 		messageCollector.writeMessage("The category is " + currentCategory().getName());
@@ -104,7 +106,7 @@ public class Game {
 		}
 	}
 
-	public boolean wasCorrectlyAnswered() {
+	public boolean correctAnswer() {
 		if (getCurrentPlayer().isInPenaltyBox()){
 			if (getCurrentPlayer().isGettingOutOfPenaltyBox()) {
 				return handleCorrectAnswer("Answer was correct!!!!");
@@ -120,7 +122,7 @@ public class Game {
 	private boolean handleCorrectAnswer(final String successMessage) {
 		messageCollector.writeMessage(successMessage);
 		getCurrentPlayer().incrementPurse();
-		messageCollector.writeMessage(players.get(currentPlayerIndex)
+		messageCollector.writeMessage(getCurrentPlayer()
 				+ " now has "
 				+ getCurrentPlayer().getPurse()
 				+ " Gold Coins.");
@@ -136,9 +138,9 @@ public class Game {
 		if (currentPlayerIndex == players.size()) currentPlayerIndex = 0;
 	}
 
-	public boolean wrongAnswer(){
+	public boolean wrongAnswer() {
 		messageCollector.writeMessage("Question was incorrectly answered");
-		messageCollector.writeMessage(players.get(currentPlayerIndex)+ " was sent to the penalty box");
+		messageCollector.writeMessage(getCurrentPlayer() + " was sent to the penalty box");
 		getCurrentPlayer().setInPenaltyBox(true);
 
 		chooseNextPlayer();

@@ -34,7 +34,7 @@ public class GameRunner {
 			if (rand.nextInt(9) == 7) {
 				notAWinner = aGame.wrongAnswer();
 			} else {
-				notAWinner = aGame.wasCorrectlyAnswered();
+				notAWinner = aGame.correctAnswer();
 			}
 
 
