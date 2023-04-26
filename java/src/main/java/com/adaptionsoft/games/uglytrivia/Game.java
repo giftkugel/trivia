@@ -5,10 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Game {
-    List<Player> players = new ArrayList();
-    //int[] places = new int[6];
-    int[] purses  = new int[6];
-    boolean[] inPenaltyBox  = new boolean[6];
+    List<Player> players = new ArrayList<>();
 
     LinkedList popQuestions = new LinkedList();
     LinkedList scienceQuestions = new LinkedList();
@@ -53,7 +50,7 @@ public class Game {
 		System.out.println(players.get(currentPlayer) + " is the current player");
 		System.out.println("They have rolled a " + roll);
 
-		if (inPenaltyBox[currentPlayer]) {
+		if (getCurrentPlayer().isInPenaltyBox()) {
 			if (roll % 2 != 0) {
 				isGettingOutOfPenaltyBox = true;
 
@@ -111,13 +108,13 @@ public class Game {
 	}
 
 	public boolean wasCorrectlyAnswered() {
-		if (inPenaltyBox[currentPlayer]){
+		if (getCurrentPlayer().isInPenaltyBox()){
 			if (isGettingOutOfPenaltyBox) {
 				System.out.println("Answer was correct!!!!");
-				purses[currentPlayer]++;
+				getCurrentPlayer().incrementPurse();
 				System.out.println(players.get(currentPlayer)
 						+ " now has "
-						+ purses[currentPlayer]
+						+ getCurrentPlayer().getPurse()
 						+ " Gold Coins.");
 
 				boolean winner = didPlayerWin();
@@ -136,10 +133,10 @@ public class Game {
 		} else {
 
 			System.out.println("Answer was corrent!!!!");
-			purses[currentPlayer]++;
+			getCurrentPlayer().incrementPurse();
 			System.out.println(players.get(currentPlayer)
 					+ " now has "
-					+ purses[currentPlayer]
+					+ getCurrentPlayer().getPurse()
 					+ " Gold Coins.");
 
 			boolean winner = didPlayerWin();
@@ -153,7 +150,7 @@ public class Game {
 	public boolean wrongAnswer(){
 		System.out.println("Question was incorrectly answered");
 		System.out.println(players.get(currentPlayer)+ " was sent to the penalty box");
-		inPenaltyBox[currentPlayer] = true;
+		getCurrentPlayer().setInPenaltyBox(true);
 
 		currentPlayer++;
 		if (currentPlayer == players.size()) currentPlayer = 0;
@@ -162,7 +159,7 @@ public class Game {
 
 
 	private boolean didPlayerWin() {
-		return !(purses[currentPlayer] == 6);
+		return !(getCurrentPlayer().getPurse() == 6);
 	}
 
 	private Player getCurrentPlayer() {

@@ -33,8 +33,8 @@ public class Player {
         return purse;
     }
 
-    public void setPurse(final int purse) {
-        this.purse = purse;
+    public void incrementPurse() {
+        purse++;
     }
 
     public boolean isInPenaltyBox() {
