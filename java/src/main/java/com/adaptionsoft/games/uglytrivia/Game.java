@@ -2,10 +2,11 @@ package com.adaptionsoft.games.uglytrivia;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class Game {
-    ArrayList players = new ArrayList();
-    int[] places = new int[6];
+    List<Player> players = new ArrayList();
+    //int[] places = new int[6];
     int[] purses  = new int[6];
     boolean[] inPenaltyBox  = new boolean[6];
 
@@ -37,10 +38,7 @@ public class Game {
 	public boolean add(String playerName) {
 
 
-	    players.add(playerName);
-	    places[howManyPlayers()] = 0;
-	    purses[howManyPlayers()] = 0;
-	    inPenaltyBox[howManyPlayers()] = false;
+	    players.add(new Player(playerName));
 
 	    System.out.println(playerName + " was added");
 	    System.out.println("They are player number " + players.size());
@@ -76,12 +74,13 @@ public class Game {
 	}
 
 	private void calculatePlayerPlace(final int roll) {
-		places[currentPlayer] = places[currentPlayer] + roll;
-		if (places[currentPlayer] > 11) places[currentPlayer] = places[currentPlayer] - 12;
+		Player currentPlayer = getCurrentPlayer();
+		currentPlayer.calculatePlace(roll);
 
-		System.out.println(players.get(currentPlayer)
+
+		System.out.println(currentPlayer.getName()
 				+ "'s new location is "
-				+ places[currentPlayer]);
+				+ currentPlayer.getPlace());
 		System.out.println("The category is " + currentCategory().getName());
 	}
 
@@ -98,15 +97,16 @@ public class Game {
 
 
 	private Category currentCategory() {
-		if (places[currentPlayer] == 0) return Category.POP;
-		if (places[currentPlayer] == 4) return Category.POP;
-		if (places[currentPlayer] == 8) return Category.POP;
-		if (places[currentPlayer] == 1) return Category.SCIENCE;
-		if (places[currentPlayer] == 5) return Category.SCIENCE;
-		if (places[currentPlayer] == 9) return Category.SCIENCE;
-		if (places[currentPlayer] == 2) return Category.SPORTS;
-		if (places[currentPlayer] == 6) return Category.SPORTS;
-		if (places[currentPlayer] == 10) return Category.SPORTS;
+		int currentPlace = getCurrentPlayer().getPlace();
+		if (currentPlace == 0) return Category.POP;
+		if (currentPlace == 4) return Category.POP;
+		if (currentPlace == 8) return Category.POP;
+		if (currentPlace == 1) return Category.SCIENCE;
+		if (currentPlace == 5) return Category.SCIENCE;
+		if (currentPlace == 9) return Category.SCIENCE;
+		if (currentPlace == 2) return Category.SPORTS;
+		if (currentPlace == 6) return Category.SPORTS;
+		if (currentPlace == 10) return Category.SPORTS;
 		return Category.ROCK;
 	}
 
@@ -163,5 +163,9 @@ public class Game {
 
 	private boolean didPlayerWin() {
 		return !(purses[currentPlayer] == 6);
+	}
+
+	private Player getCurrentPlayer() {
+		return players.get(currentPlayer);
 	}
 }
