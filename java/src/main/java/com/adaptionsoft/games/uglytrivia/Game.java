@@ -1,28 +1,20 @@
 package com.adaptionsoft.games.uglytrivia;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class Game {
 
-	MessageCollector messageCollector;
-    List<Player> players = new ArrayList<>();
+	private final MessageCollector messageCollector;
+	private final List<Player> players = new ArrayList<>();
 
-	Map<Category, LinkedList<Question>> questions = new EnumMap<>(Category.class);
+	private final QuestionBox questionBox = new QuestionBox();
 
     int currentPlayerIndex = 0;
 
-    public  Game(final MessageCollector messageCollector) {
+    public Game(final MessageCollector messageCollector) {
 		this.messageCollector = messageCollector;
 		initializeQuestions();
-	}
-
-	public void createQuestion(Category category, int index) {
-		Question question =  new Question(index, category);
-		questions.computeIfAbsent(category, key -> new LinkedList<>()).addLast(question);
 	}
 
 	public boolean isPlayable() {
@@ -88,6 +80,11 @@ public class Game {
 		}
 	}
 
+	private void createQuestion(Category category, int index) {
+		Question question =  new Question(index, category);
+		questionBox.addQuestion(question);
+	}
+
 	private boolean handleCorrectAnswer(final String successMessage) {
 		writeMessage(successMessage);
 		getCurrentPlayer().incrementPurse();
@@ -113,7 +110,7 @@ public class Game {
 	}
 
 	private void askQuestion() {
-		Question question = questions.get(currentCategory()).removeFirst();
+		Question question = questionBox.getNextQuestion(currentCategory());
 		writeMessage(question.toString());
 	}
 
