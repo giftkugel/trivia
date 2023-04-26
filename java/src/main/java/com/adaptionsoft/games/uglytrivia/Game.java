@@ -7,10 +7,10 @@ import java.util.List;
 public class Game {
     List<Player> players = new ArrayList<>();
 
-    LinkedList popQuestions = new LinkedList();
-    LinkedList scienceQuestions = new LinkedList();
-    LinkedList sportsQuestions = new LinkedList();
-    LinkedList rockQuestions = new LinkedList();
+	LinkedList<Question> popQuestions = new LinkedList<>();
+	LinkedList<Question> scienceQuestions = new LinkedList<>();
+	LinkedList<Question> sportsQuestions = new LinkedList<>();
+	LinkedList<Question> rockQuestions = new LinkedList<>();
 
     int currentPlayer = 0;
     boolean isGettingOutOfPenaltyBox;
@@ -24,8 +24,8 @@ public class Game {
     	}
     }
 
-	public String createQuestion(Category category, int index){
-		return String.format("%s Question %d", category.getName(), index);
+	public Question createQuestion(Category category, int index){
+		return new Question(index, category);
 	}
 
 	public boolean isPlayable() {
