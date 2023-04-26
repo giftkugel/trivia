@@ -21,7 +21,7 @@ public class Game {
 		return (howManyPlayers() >= 2);
 	}
 
-	public boolean add(String playerName) {
+	public boolean add(final String playerName) {
 		players.add(new Player(playerName));
 
 		writeMessage(playerName + " was added");
@@ -33,7 +33,7 @@ public class Game {
 		return players.size();
 	}
 
-	public void roll(int roll) {
+	public void roll(final int roll) {
 		writeMessageForCurrentPlayer(" is the current player");
 		writeMessage("They have rolled a " + roll);
 
@@ -80,7 +80,7 @@ public class Game {
 		}
 	}
 
-	private void createQuestion(Category category, int index) {
+	private void createQuestion(final Category category, final int index) {
 		Question question =  new Question(index, category);
 		questionBox.addQuestion(question);
 	}
