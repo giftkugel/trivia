@@ -14,7 +14,6 @@ public class Game {
 	Map<Category, LinkedList<Question>> questions = new EnumMap<>(Category.class);
 
     int currentPlayerIndex = 0;
-    boolean isGettingOutOfPenaltyBox;
 
     public  Game(final MessageCollector messageCollector) {
 		this.messageCollector = messageCollector;
@@ -40,10 +39,10 @@ public class Game {
 	}
 
 	public boolean add(String playerName) {
-	    players.add(new Player(playerName));
+		players.add(new Player(playerName));
 
-	    messageCollector.writeMessage(playerName + " was added");
-	    messageCollector.writeMessage("They are player number " + players.size());
+		messageCollector.writeMessage(playerName + " was added");
+		messageCollector.writeMessage("They are player number " + players.size());
 		return true;
 	}
 
@@ -57,14 +56,14 @@ public class Game {
 
 		if (getCurrentPlayer().isInPenaltyBox()) {
 			if (roll % 2 != 0) {
-				isGettingOutOfPenaltyBox = true;
+				getCurrentPlayer().setGettingOutOfPenaltyBox(true);
 
 				messageCollector.writeMessage(players.get(currentPlayerIndex) + " is getting out of the penalty box");
 				calculatePlayerPlace(roll);
 				askQuestion();
 			} else {
 				messageCollector.writeMessage(players.get(currentPlayerIndex) + " is not getting out of the penalty box");
-				isGettingOutOfPenaltyBox = false;
+				getCurrentPlayer().setGettingOutOfPenaltyBox(false);
 			}
 		} else {
 			calculatePlayerPlace(roll);
@@ -107,7 +106,7 @@ public class Game {
 
 	public boolean wasCorrectlyAnswered() {
 		if (getCurrentPlayer().isInPenaltyBox()){
-			if (isGettingOutOfPenaltyBox) {
+			if (getCurrentPlayer().isGettingOutOfPenaltyBox()) {
 				return handleCorrectAnswer("Answer was correct!!!!");
 			} else {
 				chooseNextPlayer();

@@ -8,11 +8,14 @@ public class Player {
 
     private boolean inPenaltyBox;
 
+    private boolean isGettingOutOfPenaltyBox;
+
     public Player(final String name) {
         this.name = name;
         this.place = 0;
         this.purse = 0;
         this.inPenaltyBox = false;
+        this.isGettingOutOfPenaltyBox = false;
     }
 
     public String getName() {
@@ -43,6 +46,14 @@ public class Player {
 
     public void setInPenaltyBox(final boolean inPenaltyBox) {
         this.inPenaltyBox = inPenaltyBox;
+    }
+
+    public boolean isGettingOutOfPenaltyBox() {
+        return isGettingOutOfPenaltyBox;
+    }
+
+    public void setGettingOutOfPenaltyBox(final boolean gettingOutOfPenaltyBox) {
+        isGettingOutOfPenaltyBox = gettingOutOfPenaltyBox;
     }
 
     @Override
