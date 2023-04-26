@@ -2,6 +2,7 @@
 package com.adaptionsoft.games.trivia.runner;
 import java.util.Random;
 
+import com.adaptionsoft.games.uglytrivia.Dice;
 import com.adaptionsoft.games.uglytrivia.Game;
 import com.adaptionsoft.games.uglytrivia.MessageCollector;
 
@@ -25,12 +26,13 @@ public class GameRunner {
 		aGame.add("Sue");
 
 		Random rand = new Random(seed);
+		Dice dice = new Dice(rand);
 
 		boolean notAWinner;
 		do {
 
-			int diceValue = rand.nextInt(5) + 1;
-			aGame.roll(diceValue);
+			dice.roll();
+			aGame.handleDiceValue(dice);
 
 			if (rand.nextInt(9) == 7) {
 				notAWinner = aGame.wrongAnswer();

@@ -33,17 +33,18 @@ public class Game {
         return players.size();
     }
 
-    public void roll(final int roll) {
+    public void handleDiceValue(final Dice dice) {
+        int diceValue = dice.getValue();
         writeMessageForCurrentPlayer(" is the current player");
-        writeMessage("They have rolled a " + roll);
+        writeMessage("They have rolled a " + diceValue);
 
-        checkPenaltyBox(roll);
+        checkPenaltyBox(diceValue);
 
         boolean playerNotInPenaltyBox = !getCurrentPlayer().isInPenaltyBox();
         boolean playerWillLeavePenaltyBox = getCurrentPlayer().isInPenaltyBox() && getCurrentPlayer().isGettingOutOfPenaltyBox();
 
         if (playerNotInPenaltyBox || playerWillLeavePenaltyBox) {
-            calculatePlayerPlace(roll);
+            calculatePlayerPlace(diceValue);
             askQuestion();
         }
 
