@@ -26,10 +26,8 @@ public class Player {
         return place;
     }
 
-    public void calculatePlace(final int roll) {
-        place = place + roll;
-
-        if (place > 11) place = place - 12;
+    public void setPlace(final int place) {
+        this.place = place;
     }
 
     public int getPurse() {
