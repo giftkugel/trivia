@@ -1,31 +1,31 @@
 package com.adaptionsoft.games.uglytrivia;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class Game {
     List<Player> players = new ArrayList<>();
 
-	LinkedList<Question> popQuestions = new LinkedList<>();
-	LinkedList<Question> scienceQuestions = new LinkedList<>();
-	LinkedList<Question> sportsQuestions = new LinkedList<>();
-	LinkedList<Question> rockQuestions = new LinkedList<>();
+	Map<Category, LinkedList<Question>> questions = new HashMap<>();
 
     int currentPlayer = 0;
     boolean isGettingOutOfPenaltyBox;
 
     public  Game(){
     	for (int i = 0; i < 50; i++) {
-			popQuestions.addLast(createQuestion(Category.POP, i));
-			scienceQuestions.addLast(createQuestion(Category.SCIENCE, i));
-			sportsQuestions.addLast(createQuestion(Category.SPORTS, i));
-			rockQuestions.addLast(createQuestion(Category.ROCK, i));
+			createQuestion(Category.POP, i);
+			createQuestion(Category.SCIENCE, i);
+			createQuestion(Category.SPORTS, i);
+			createQuestion(Category.ROCK, i);
     	}
     }
 
-	public Question createQuestion(Category category, int index){
-		return new Question(index, category);
+	public void createQuestion(Category category, int index) {
+		Question question =  new Question(index, category);
+		questions.computeIfAbsent(category, key -> new LinkedList<>()).addLast(question);
 	}
 
 	public boolean isPlayable() {
@@ -82,14 +82,7 @@ public class Game {
 	}
 
 	private void askQuestion() {
-		if (currentCategory() == Category.POP)
-			System.out.println(popQuestions.removeFirst());
-		if (currentCategory() == Category.SCIENCE)
-			System.out.println(scienceQuestions.removeFirst());
-		if (currentCategory() == Category.SPORTS)
-			System.out.println(sportsQuestions.removeFirst());
-		if (currentCategory() == Category.ROCK)
-			System.out.println(rockQuestions.removeFirst());
+		System.out.println(questions.get(currentCategory()).removeFirst());
 	}
 
 
