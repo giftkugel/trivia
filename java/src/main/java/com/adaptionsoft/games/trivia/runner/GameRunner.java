@@ -29,15 +29,14 @@ public class GameRunner {
 		boolean notAWinner;
 		do {
 
-			aGame.roll(rand.nextInt(5) + 1);
+			int diceValue = rand.nextInt(5) + 1;
+			aGame.roll(diceValue);
 
 			if (rand.nextInt(9) == 7) {
 				notAWinner = aGame.wrongAnswer();
 			} else {
 				notAWinner = aGame.correctAnswer();
 			}
-
-
 
 		} while (notAWinner);
 	}
