@@ -1,7 +1,7 @@
 package com.adaptionsoft.games.uglytrivia;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +9,7 @@ import java.util.Map;
 public class Game {
     List<Player> players = new ArrayList<>();
 
-	Map<Category, LinkedList<Question>> questions = new HashMap<>();
+	Map<Category, LinkedList<Question>> questions = new EnumMap<>(Category.class);
 
     int currentPlayer = 0;
     boolean isGettingOutOfPenaltyBox;
@@ -88,16 +88,17 @@ public class Game {
 
 	private Category currentCategory() {
 		int currentPlace = getCurrentPlayer().getPlace();
-		if (currentPlace == 0) return Category.POP;
-		if (currentPlace == 4) return Category.POP;
-		if (currentPlace == 8) return Category.POP;
-		if (currentPlace == 1) return Category.SCIENCE;
-		if (currentPlace == 5) return Category.SCIENCE;
-		if (currentPlace == 9) return Category.SCIENCE;
-		if (currentPlace == 2) return Category.SPORTS;
-		if (currentPlace == 6) return Category.SPORTS;
-		if (currentPlace == 10) return Category.SPORTS;
-		return Category.ROCK;
+		int categoryValue = currentPlace % 4;
+		switch (categoryValue) {
+			case 0:
+				return Category.POP;
+			case 1:
+				return Category.SCIENCE;
+			case 2:
+				return Category.SPORTS;
+			default:
+				return Category.ROCK;
+		}
 	}
 
 	public boolean wasCorrectlyAnswered() {
@@ -152,7 +153,7 @@ public class Game {
 
 
 	private boolean didPlayerWin() {
-		return !(getCurrentPlayer().getPurse() == 6);
+		return getCurrentPlayer().getPurse() != 6;
 	}
 
 	private Player getCurrentPlayer() {
