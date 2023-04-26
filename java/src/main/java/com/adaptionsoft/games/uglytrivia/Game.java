@@ -1,16 +1,15 @@
 package com.adaptionsoft.games.uglytrivia;
 
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.stream.IntStream;
 
 public class Game {
 
     private final MessageCollector messageCollector;
-    private final List<Player> players = new ArrayList<>();
 
     private final QuestionBox questionBox = new QuestionBox();
 
-    int currentPlayerIndex = 0;
+    private final GameState gameState = new GameState();
 
     public Game(final MessageCollector messageCollector) {
         this.messageCollector = messageCollector;
@@ -18,19 +17,15 @@ public class Game {
     }
 
     public boolean isPlayable() {
-        return (howManyPlayers() >= 2);
+        return (gameState.howManyPlayers() >= 2);
     }
 
     public boolean add(final String playerName) {
-        players.add(new Player(playerName));
+        gameState.addPlayer(new Player(playerName));
 
         writeMessage(playerName + " was added");
-        writeMessage("They are player number " + howManyPlayers());
+        writeMessage("They are player number " + gameState.howManyPlayers());
         return true;
-    }
-
-    public int howManyPlayers() {
-        return players.size();
     }
 
     public void handleDiceValue(final Dice dice) {
@@ -40,10 +35,10 @@ public class Game {
 
         checkPenaltyBox(diceValue);
 
-        boolean playerNotInPenaltyBox = !getCurrentPlayer().isInPenaltyBox();
-        boolean playerWillLeavePenaltyBox = getCurrentPlayer().isInPenaltyBox() && getCurrentPlayer().isGettingOutOfPenaltyBox();
+        boolean playerIsPenaltyBox = gameState.isInPenaltyBox();
+        boolean playerWillLeavePenaltyBox = playerIsPenaltyBox && gameState.isGettingOutOfPenaltyBox();
 
-        if (playerNotInPenaltyBox || playerWillLeavePenaltyBox) {
+        if (!playerIsPenaltyBox || playerWillLeavePenaltyBox) {
             calculatePlayerPlace(diceValue);
             askQuestion();
         }
@@ -51,11 +46,13 @@ public class Game {
     }
 
     public boolean correctAnswer() {
-        if (getCurrentPlayer().isInPenaltyBox()){
-            if (getCurrentPlayer().isGettingOutOfPenaltyBox()) {
+        boolean playerIsPenaltyBox = gameState.isInPenaltyBox();
+        if (playerIsPenaltyBox){
+            boolean playerWillLeavePenaltyBox = gameState.isGettingOutOfPenaltyBox();
+            if (playerWillLeavePenaltyBox) {
                 return handleCorrectAnswer("Answer was correct!!!!");
             } else {
-                chooseNextPlayer();
+                gameState.chooseNextPlayer();
                 return true;
             }
         } else {
@@ -66,47 +63,43 @@ public class Game {
     public boolean wrongAnswer() {
         writeMessage("Question was incorrectly answered");
         writeMessageForCurrentPlayer(" was sent to the penalty box");
-        getCurrentPlayer().setInPenaltyBox(true);
+        gameState.setInPenaltyBox(true);
 
-        chooseNextPlayer();
+        gameState.chooseNextPlayer();
         return true;
     }
 
     private void initializeQuestions() {
-        for (int i = 0; i < 50; i++) {
-            createQuestion(Category.POP, i);
-            createQuestion(Category.SCIENCE, i);
-            createQuestion(Category.SPORTS, i);
-            createQuestion(Category.ROCK, i);
-        }
+        IntStream.range(0, 50).forEach(this::createQuestionsForIndex);
+    }
+
+    private void createQuestionsForIndex(final int index) {
+        createQuestion(Category.POP, index);
+        createQuestion(Category.SCIENCE, index);
+        createQuestion(Category.SPORTS, index);
+        createQuestion(Category.ROCK, index);
     }
 
     private void createQuestion(final Category category, final int index) {
-        Question question =  new Question(index, category);
+        Question question = new Question(index, category);
         questionBox.addQuestion(question);
     }
 
     private boolean handleCorrectAnswer(final String successMessage) {
         writeMessage(successMessage);
-        getCurrentPlayer().incrementPurse();
-        writeMessageForCurrentPlayer(" now has " + getCurrentPlayer().getPurse() + " Gold Coins.");
+        gameState.incrementPurse();
+        writeMessageForCurrentPlayer(" now has " + gameState.getPurse() + " Gold Coins.");
 
         boolean winner = didPlayerWin();
-        chooseNextPlayer();
+        gameState.chooseNextPlayer();
 
         return winner;
     }
 
     private void calculatePlayerPlace(final int roll) {
-        Player currentPlayer = getCurrentPlayer();
-        int newPlace = currentPlayer.getPlace() + roll;
+        gameState.updatePlaceWithRoll(roll);
 
-        if (newPlace > 11) {
-            newPlace = newPlace - 12;
-        }
-        currentPlayer.setPlace(newPlace);
-
-        writeMessageForCurrentPlayer("'s new location is " + currentPlayer.getPlace());
+        writeMessageForCurrentPlayer("'s new location is " + gameState.getPlace());
         writeMessage("The category is " + currentCategory().getName());
     }
 
@@ -116,9 +109,10 @@ public class Game {
     }
 
     private void checkPenaltyBox(final int roll) {
-        if (getCurrentPlayer().isInPenaltyBox()) {
+        boolean playerIsPenaltyBox = gameState.isInPenaltyBox();
+        if (playerIsPenaltyBox) {
             boolean outOfPenaltyBox = roll % 2 != 0;
-            getCurrentPlayer().setGettingOutOfPenaltyBox(outOfPenaltyBox);
+            gameState.setGettingOutOfPenaltyBox(outOfPenaltyBox);
             if (outOfPenaltyBox) {
                 writeMessageForCurrentPlayer(" is getting out of the penalty box");
             } else {
@@ -128,28 +122,20 @@ public class Game {
     }
 
     private Category currentCategory() {
-        int currentPlace = getCurrentPlayer().getPlace();
+        int currentPlace = gameState.getPlace();
         return Category.getCategoryForPlace(currentPlace);
     }
 
     private void writeMessageForCurrentPlayer(final String message) {
-        messageCollector.writeMessage(getCurrentPlayer() + message);
+        messageCollector.writeMessage(gameState.getCurrentPlayer() + message);
     }
 
     private void writeMessage(final String message) {
         messageCollector.writeMessage(message);
     }
 
-    private void chooseNextPlayer() {
-        currentPlayerIndex++;
-        if (currentPlayerIndex == players.size()) currentPlayerIndex = 0;
-    }
-
     private boolean didPlayerWin() {
-        return getCurrentPlayer().getPurse() != 6;
+        return gameState.getPurse() != 6;
     }
 
-    private Player getCurrentPlayer() {
-        return players.get(currentPlayerIndex);
-    }
 }
