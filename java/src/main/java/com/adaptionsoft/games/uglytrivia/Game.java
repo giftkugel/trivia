@@ -65,10 +65,8 @@ public class Game {
 			} else {
 				messageCollector.writeMessage(players.get(currentPlayerIndex) + " is not getting out of the penalty box");
 				isGettingOutOfPenaltyBox = false;
-				}
-
+			}
 		} else {
-
 			calculatePlayerPlace(roll);
 			askQuestion();
 		}
@@ -110,38 +108,28 @@ public class Game {
 	public boolean wasCorrectlyAnswered() {
 		if (getCurrentPlayer().isInPenaltyBox()){
 			if (isGettingOutOfPenaltyBox) {
-				messageCollector.writeMessage("Answer was correct!!!!");
-				getCurrentPlayer().incrementPurse();
-				messageCollector.writeMessage(players.get(currentPlayerIndex)
-						+ " now has "
-						+ getCurrentPlayer().getPurse()
-						+ " Gold Coins.");
-
-				boolean winner = didPlayerWin();
-				chooseNextPlayer();
-
-				return winner;
+				return handleCorrectAnswer("Answer was correct!!!!");
 			} else {
 				chooseNextPlayer();
 				return true;
 			}
-
-
-
 		} else {
-
-			messageCollector.writeMessage("Answer was corrent!!!!");
-			getCurrentPlayer().incrementPurse();
-			messageCollector.writeMessage(players.get(currentPlayerIndex)
-					+ " now has "
-					+ getCurrentPlayer().getPurse()
-					+ " Gold Coins.");
-
-			boolean winner = didPlayerWin();
-			chooseNextPlayer();
-
-			return winner;
+			return handleCorrectAnswer("Answer was corrent!!!!");
 		}
+	}
+
+	private boolean handleCorrectAnswer(final String successMessage) {
+		messageCollector.writeMessage(successMessage);
+		getCurrentPlayer().incrementPurse();
+		messageCollector.writeMessage(players.get(currentPlayerIndex)
+				+ " now has "
+				+ getCurrentPlayer().getPurse()
+				+ " Gold Coins.");
+
+		boolean winner = didPlayerWin();
+		chooseNextPlayer();
+
+		return winner;
 	}
 
 	private void chooseNextPlayer() {
