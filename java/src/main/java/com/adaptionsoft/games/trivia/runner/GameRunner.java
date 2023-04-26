@@ -3,18 +3,22 @@ package com.adaptionsoft.games.trivia.runner;
 import java.util.Random;
 
 import com.adaptionsoft.games.uglytrivia.Game;
+import com.adaptionsoft.games.uglytrivia.MessageCollector;
 
 
 public class GameRunner {
-
-	private static boolean notAWinner;
 
 	public static void main(String[] args) {
 		long seed = 42;
 		if (args.length == 1) {
 			seed = Long.parseLong(args[0]);
 		}
-		Game aGame = new Game();
+
+		runGame(seed, new MessageCollector(System.out));
+	}
+
+	public static void runGame(final long seed, final MessageCollector messageCollector) {
+		Game aGame = new Game(messageCollector);
 
 		aGame.add("Chet");
 		aGame.add("Pat");
@@ -22,6 +26,7 @@ public class GameRunner {
 
 		Random rand = new Random(seed);
 
+		boolean notAWinner;
 		do {
 
 			aGame.roll(rand.nextInt(5) + 1);
@@ -35,6 +40,5 @@ public class GameRunner {
 
 
 		} while (notAWinner);
-
 	}
 }

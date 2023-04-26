@@ -2,6 +2,7 @@ package com.adaptionsoft.games.trivia;
 
 
 import com.adaptionsoft.games.trivia.runner.GameRunner;
+import com.adaptionsoft.games.uglytrivia.MessageCollector;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,14 +21,8 @@ import java.util.Random;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SomeTest {
-
-    // Sys.out => file
-    // Handle Random
-    // Sys.out => other file
-    // Test check files
 
     private static final Random seedGenerator = new Random(1);
 
@@ -52,9 +47,8 @@ class SomeTest {
 
             var testOutput = new FileOutputStream(file);
             PrintStream ps = new PrintStream(testOutput);
-            System.setOut(ps);
 
-            GameRunner.main(new String[]{seed.toString()});
+            GameRunner.runGame(seed, new MessageCollector(ps));
         }
 
     }
@@ -68,13 +62,8 @@ class SomeTest {
 
         var testOutput = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(testOutput);
-        System.setOut(ps);
 
-        GameRunner.main(new String[]{seed.toString()});
-
-        // compare refactored.out with golden_master.out for equality
-        System.out.flush();
-
+        GameRunner.runGame(seed, new MessageCollector(ps));
 
         var output = testOutput.toString();
         assertEquals(output, reference);

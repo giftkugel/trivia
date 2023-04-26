@@ -7,21 +7,28 @@ import java.util.List;
 import java.util.Map;
 
 public class Game {
+
+	MessageCollector messageCollector;
     List<Player> players = new ArrayList<>();
 
 	Map<Category, LinkedList<Question>> questions = new EnumMap<>(Category.class);
 
-    int currentPlayer = 0;
+    int currentPlayerIndex = 0;
     boolean isGettingOutOfPenaltyBox;
 
-    public  Game(){
-    	for (int i = 0; i < 50; i++) {
+    public  Game(final MessageCollector messageCollector) {
+		this.messageCollector = messageCollector;
+		initializeQuestions();
+	}
+
+	private void initializeQuestions() {
+		for (int i = 0; i < 50; i++) {
 			createQuestion(Category.POP, i);
 			createQuestion(Category.SCIENCE, i);
 			createQuestion(Category.SPORTS, i);
 			createQuestion(Category.ROCK, i);
-    	}
-    }
+		}
+	}
 
 	public void createQuestion(Category category, int index) {
 		Question question =  new Question(index, category);
@@ -33,12 +40,10 @@ public class Game {
 	}
 
 	public boolean add(String playerName) {
-
-
 	    players.add(new Player(playerName));
 
-	    System.out.println(playerName + " was added");
-	    System.out.println("They are player number " + players.size());
+	    messageCollector.writeMessage(playerName + " was added");
+	    messageCollector.writeMessage("They are player number " + players.size());
 		return true;
 	}
 
@@ -47,18 +52,18 @@ public class Game {
 	}
 
 	public void roll(int roll) {
-		System.out.println(players.get(currentPlayer) + " is the current player");
-		System.out.println("They have rolled a " + roll);
+		messageCollector.writeMessage(players.get(currentPlayerIndex) + " is the current player");
+		messageCollector.writeMessage("They have rolled a " + roll);
 
 		if (getCurrentPlayer().isInPenaltyBox()) {
 			if (roll % 2 != 0) {
 				isGettingOutOfPenaltyBox = true;
 
-				System.out.println(players.get(currentPlayer) + " is getting out of the penalty box");
+				messageCollector.writeMessage(players.get(currentPlayerIndex) + " is getting out of the penalty box");
 				calculatePlayerPlace(roll);
 				askQuestion();
 			} else {
-				System.out.println(players.get(currentPlayer) + " is not getting out of the penalty box");
+				messageCollector.writeMessage(players.get(currentPlayerIndex) + " is not getting out of the penalty box");
 				isGettingOutOfPenaltyBox = false;
 				}
 
@@ -75,14 +80,15 @@ public class Game {
 		currentPlayer.calculatePlace(roll);
 
 
-		System.out.println(currentPlayer.getName()
+		messageCollector.writeMessage(currentPlayer.getName()
 				+ "'s new location is "
 				+ currentPlayer.getPlace());
-		System.out.println("The category is " + currentCategory().getName());
+		messageCollector.writeMessage("The category is " + currentCategory().getName());
 	}
 
 	private void askQuestion() {
-		System.out.println(questions.get(currentCategory()).removeFirst());
+		Question question = questions.get(currentCategory()).removeFirst();
+		messageCollector.writeMessage(question.toString());
 	}
 
 
@@ -104,21 +110,19 @@ public class Game {
 	public boolean wasCorrectlyAnswered() {
 		if (getCurrentPlayer().isInPenaltyBox()){
 			if (isGettingOutOfPenaltyBox) {
-				System.out.println("Answer was correct!!!!");
+				messageCollector.writeMessage("Answer was correct!!!!");
 				getCurrentPlayer().incrementPurse();
-				System.out.println(players.get(currentPlayer)
+				messageCollector.writeMessage(players.get(currentPlayerIndex)
 						+ " now has "
 						+ getCurrentPlayer().getPurse()
 						+ " Gold Coins.");
 
 				boolean winner = didPlayerWin();
-				currentPlayer++;
-				if (currentPlayer == players.size()) currentPlayer = 0;
+				chooseNextPlayer();
 
 				return winner;
 			} else {
-				currentPlayer++;
-				if (currentPlayer == players.size()) currentPlayer = 0;
+				chooseNextPlayer();
 				return true;
 			}
 
@@ -126,28 +130,31 @@ public class Game {
 
 		} else {
 
-			System.out.println("Answer was corrent!!!!");
+			messageCollector.writeMessage("Answer was corrent!!!!");
 			getCurrentPlayer().incrementPurse();
-			System.out.println(players.get(currentPlayer)
+			messageCollector.writeMessage(players.get(currentPlayerIndex)
 					+ " now has "
 					+ getCurrentPlayer().getPurse()
 					+ " Gold Coins.");
 
 			boolean winner = didPlayerWin();
-			currentPlayer++;
-			if (currentPlayer == players.size()) currentPlayer = 0;
+			chooseNextPlayer();
 
 			return winner;
 		}
 	}
 
+	private void chooseNextPlayer() {
+		currentPlayerIndex++;
+		if (currentPlayerIndex == players.size()) currentPlayerIndex = 0;
+	}
+
 	public boolean wrongAnswer(){
-		System.out.println("Question was incorrectly answered");
-		System.out.println(players.get(currentPlayer)+ " was sent to the penalty box");
+		messageCollector.writeMessage("Question was incorrectly answered");
+		messageCollector.writeMessage(players.get(currentPlayerIndex)+ " was sent to the penalty box");
 		getCurrentPlayer().setInPenaltyBox(true);
 
-		currentPlayer++;
-		if (currentPlayer == players.size()) currentPlayer = 0;
+		chooseNextPlayer();
 		return true;
 	}
 
@@ -157,6 +164,6 @@ public class Game {
 	}
 
 	private Player getCurrentPlayer() {
-		return players.get(currentPlayer);
+		return players.get(currentPlayerIndex);
 	}
 }
